@@ -1,0 +1,21 @@
+{
+    "name": "@videoditor/restate",
+    "version": "0.1.0",
+    "type": "module",
+    "files": [
+        "dist"
+    ],
+    "module": "./dist/index.ts",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+    },
+    "scripts": {
+        "dev": "tsc --watch",
+        "build": "tsc --build"
+    },
+    "devDependencies": {
+        "typescript": "^4.9.4"
+    }
+}
