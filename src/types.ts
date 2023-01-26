@@ -6,6 +6,7 @@ export type SubsFunction<T> = (state: InternalState<T>) => void;
 
 export type State<T> = {
     initialValue: T;
+    onChange?: (value: T) => void;
 };
 
 export type StateCollection = { [key: string]: State<any> };

@@ -16,9 +16,7 @@ function useGlobalState2<T>(state: InternalState<T>): [T, InternalState<T>["set"
                 if (typeof v === "function") return true;
                 return false;
             };
-            console.log(state.value);
             if (isFunction(value)) value = value(state.value);
-            console.log(value);
             state.set?.(value);
         },
         [state.set]
@@ -29,7 +27,6 @@ function useGlobalState2<T>(state: InternalState<T>): [T, InternalState<T>["set"
     }, []);
 
     React.useEffect(() => {
-        if (!Array.isArray(state.subs)) state.subs = [];
         state.subs.push(onUpdate);
         return () => {
             state.subs = state.subs.filter((v) => v !== onUpdate);
