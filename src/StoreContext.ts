@@ -1,6 +1,6 @@
 import React from "react";
-import type { State2Collection } from "./types";
+import type { InternalStateCollection } from "./types";
 
-const context = React.createContext<State2Collection>({});
+const context = React.createContext<InternalStateCollection>({});
 
 export default context;

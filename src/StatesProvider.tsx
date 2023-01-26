@@ -1,16 +1,16 @@
 import React from "react";
 import StoreContext from "./StoreContext";
-import type { StateCollection, State2Collection } from "./types";
+import type { StateCollection, InternalStateCollection } from "./types";
 
 export interface StoreProviderProps {
     children: any;
     states: StateCollection;
 }
 
-export const StoreProvider: React.FC<StoreProviderProps> = (props) => {
+export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
     const parentContext = React.useContext(StoreContext);
 
-    const states: State2Collection = { ...parentContext, ...props.states } as any;
+    const states: InternalStateCollection = { ...parentContext, ...props.states } as any;
 
     React.useMemo(() => {
         Object.keys(states).forEach((state) => {

@@ -1,23 +1,30 @@
 import React from "react";
 import StoreContext from "./StoreContext";
-import type { State2, SubsFunction } from "./types";
+import type { InternalState, SetterArg, SubsFunction } from "./types";
 
 export function useGlobalState<T>(state: string) {
     const context = React.useContext(StoreContext);
     return useGlobalState2<T>(context[state]);
 }
 
-function useGlobalState2<T>(state: State2<T>): [T, State2<T>["set"]] {
+function useGlobalState2<T>(state: InternalState<T>): [T, InternalState<T>["set"]] {
     const [state2, setState2] = React.useState<T>(state.value);
 
     const setter = React.useCallback(
-        (value: T) => {
+        (value: SetterArg<T>) => {
+            const isFunction = (v: any): v is Function => {
+                if (typeof v === "function") return true;
+                return false;
+            };
+            console.log(state.value);
+            if (isFunction(value)) value = value(state.value);
+            console.log(value);
             state.set?.(value);
         },
         [state.set]
     );
 
-    const onUpdate: SubsFunction<T> = React.useCallback((state: State2<T>) => {
+    const onUpdate: SubsFunction<T> = React.useCallback((state: InternalState<T>) => {
         setState2(state.value!);
     }, []);
 

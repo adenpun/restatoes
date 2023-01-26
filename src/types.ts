@@ -1,14 +1,19 @@
+export type Setter<T> = (value: SetterArg<T>) => void;
+
+export type SetterArg<T> = ((value: T) => T) | T;
+
+export type SubsFunction<T> = (state: InternalState<T>) => void;
+
 export type State<T> = {
     initialValue: T;
 };
 
-export type SubsFunction<T> = (state: State2<T>) => void;
+export type StateCollection = { [key: string]: State<any> };
 
-export type State2<T> = State<T> & {
+export type InternalState<T> = State<T> & {
     value: T;
-    set: (value: T) => void;
+    set: Setter<T>;
     subs: SubsFunction<T>[];
 };
 
-export type StateCollection = { [key: string]: State<any> };
-export type State2Collection = { [key: string]: State2<any> };
+export type InternalStateCollection = { [key: string]: InternalState<any> };
