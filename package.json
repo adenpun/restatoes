@@ -1,15 +1,15 @@
 {
-    "name": "@videoditor/restate",
+    "name": "restatoes",
     "version": "0.1.0",
     "type": "module",
     "files": [
         "dist"
     ],
-    "module": "./dist/index.js",
+    "module": "./dist/index.jsx",
     "types": "./dist/index.d.ts",
     "exports": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
+        "import": "./dist/index.jsx"
     },
     "scripts": {
         "dev": "tsc --watch",
