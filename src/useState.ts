@@ -1,37 +1,42 @@
 import React from "react";
+import { setProp, setValue } from "./StatesProvider";
 import StoreContext from "./StoreContext";
 import type { InternalState, SetterArg, SubsFunction } from "./types";
 
-export function useGlobalState<T>(state: string) {
+export function useGlobalState<T>(stateName: string): [T, InternalState<T>["set"]] {
     const context = React.useContext(StoreContext);
-    return useGlobalState2<T>(context[state]);
-}
+    const state: InternalState<T> = context[stateName];
 
-function useGlobalState2<T>(state: InternalState<T>): [T, InternalState<T>["set"]] {
     const [state2, setState2] = React.useState<T>(state.value);
 
-    const setter = React.useCallback(
-        (value: SetterArg<T>) => {
-            const isFunction = (v: any): v is Function => {
-                if (typeof v === "function") return true;
-                return false;
-            };
-            if (isFunction(value)) value = value(state.value);
-            state.set?.(value);
-        },
-        [state.set]
-    );
+    const setter = React.useCallback<InternalState<T>["set"]>((value) => {
+        if (isFunction(value)) value = value(state.value);
+        setValue(state.name, value);
+        return;
+    }, []);
 
-    const onUpdate: SubsFunction<T> = React.useCallback((state: InternalState<T>) => {
-        setState2(state.value!);
+    const onUpdate = React.useCallback<SubsFunction<T>>((state) => {
+        console.log(state);
+        setState2(state.value);
     }, []);
 
     React.useEffect(() => {
-        state.subs.push(onUpdate);
+        setProp(state.name, "subs", [...state.subs, onUpdate]);
+
         return () => {
-            state.subs = state.subs.filter((v) => v !== onUpdate);
+            console.log(state.subs);
+            setProp(
+                state.name,
+                "subs",
+                state.subs.filter((v) => v !== onUpdate)
+            );
         };
     }, []);
 
     return [state2, setter];
 }
+
+const isFunction = (value: any): value is Function => {
+    if (typeof value === "function") return true;
+    return false;
+};

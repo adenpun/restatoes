@@ -1,45 +1,77 @@
 import React from "react";
 import StoreContext from "./StoreContext";
-import type { StateCollection, InternalStateCollection, SetterArg } from "./types";
+import type { InternalState, InternalStateCollection, StateCollection } from "./types";
 
 export interface StoreProviderProps {
     children: any;
     states: StateCollection;
 }
 
-export let setValue = <T,>(states: string, value: T) => {};
+export let setValue = <T,>(state: string, value: T) => {};
+export let setProp = <T,>(state: string, prop: keyof InternalState<T>, value: T) => {};
+export let push = <T,>(state: string, prop: keyof InternalState<T>, value: T) => {};
 
 export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
     const parentContext = React.useContext(StoreContext);
 
-    const states: InternalStateCollection = { ...parentContext, ...props.states } as any;
+    const defaultStates: InternalStateCollection = { ...parentContext, ...props.states } as any;
+
+    const [states, setStates] = React.useState(() => {
+        // push  =  ()->{}
+        setProp = (state, prop, value) => {
+            setStates((originalState) => {
+                return Object.assign(originalState, {
+                    [state]: {
+                        ...originalState[state],
+                        [prop]: value,
+                    },
+                });
+            });
+        };
+        setValue = (state, value) => {
+            setProp(state, "value", value);
+            setStates((states) => {
+                states[state].subs.forEach((sub) => sub(states[state]));
+                return states;
+            });
+        };
+        return defaultStates;
+    });
 
     React.useMemo(() => {
-        setValue = (state, value) => {
-            if (!states[state].set) {
-                states[state].set = (value: SetterArg<any>) => {
-                    const isFunction = (v: any): v is Function => {
-                        if (typeof v === "function") return true;
-                        return false;
-                    };
-                    if (isFunction(value)) value = value(states[state].value);
-                    states[state].value = value;
-                    console.log(states[state].value);
-                    states[state].onChange?.(value);
-                    states[state].subs.forEach((sub) => {
-                        sub(states[state]);
-                    });
-                    return;
-                };
-            }
-            states[state].set(value);
-        };
         Object.keys(states).forEach((state) => {
-            console.log(Object.keys(states));
-            states[state].subs = [];
+            setProp(state, "name", state);
+            setProp(state, "subs", []);
             setValue(state, states[state].initialValue);
         });
     }, []);
+
+    // React.useMemo(() => {
+    //     setValue = (state, value) => {
+    //         if (!defaultStates[state].set) {
+    //             defaultStates[state].set = (value: SetterArg<any>) => {
+    //                 const isFunction = (v: any): v is Function => {
+    //                     if (typeof v === "function") return true;
+    //                     return false;
+    //                 };
+    //                 if (isFunction(value)) value = value(defaultStates[state].value);
+    //                 defaultStates[state].value = value;
+    //                 console.log(defaultStates[state].value);
+    //                 defaultStates[state].onChange?.(value);
+    //                 defaultStates[state].subs.forEach((sub) => {
+    //                     sub(defaultStates[state]);
+    //                 });
+    //                 return;
+    //             };
+    //         }
+    //         defaultStates[state].set(value);
+    //     };
+    //     Object.keys(defaultStates).forEach((state) => {
+    //         console.log(Object.keys(defaultStates));
+    //         defaultStates[state].subs = [];
+    //         setValue(state, defaultStates[state].initialValue);
+    //     });
+    // }, []);
 
     return <StoreContext.Provider value={states}>{props.children}</StoreContext.Provider>;
 };

@@ -7,7 +7,7 @@ import Increaser from "./components/Increaser";
 import Reseter from "./components/Reseter";
 
 function App() {
-    const [changed] = useGlobalState<boolean>("changed");
+    const [changed] = useGlobalState<boolean>("showTip");
 
     React.useEffect(() => {
         console.log(changed);
