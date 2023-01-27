@@ -8,12 +8,17 @@ export interface StoreProviderProps {
     states: StateCollection;
 }
 
-export let setValue = <T,>(state: string, value: T) => {};
+export let setValue = <Type,>(state: string, value: Type) => {};
 export let setProp = <Type, ReturnType>(
     state: string,
     prop: keyof InternalState<Type>,
     value: SetterArg<ReturnType, InternalState<Type>>
 ) => {};
+export let getValue = <Type,>(state: string): Promise<Type> => {
+    return new Promise<Type>((resolve, reject) => {
+        reject("ERROR");
+    });
+};
 
 export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
     const parentContext = React.useContext(StoreContext);
@@ -32,6 +37,7 @@ export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
                 });
             });
         };
+
         setValue = (state, value) => {
             setProp(state, "value", value);
             setStates((states) => {
@@ -39,6 +45,16 @@ export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
                 return states;
             });
         };
+
+        getValue = (state) => {
+            return new Promise<any>((resolve) => {
+                setStates((states) => {
+                    resolve(states[state].value);
+                    return states;
+                });
+            });
+        };
+
         return defaultStates;
     });
 
