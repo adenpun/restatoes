@@ -1,7 +1,8 @@
 import React from "react";
 import { setProp, setValue } from "./StatesProvider";
 import StoreContext from "./StoreContext";
-import type { InternalState, SetterArg, SubsFunction } from "./types";
+import type { InternalState, SubsFunction } from "./types";
+import { isFunction } from "./utils";
 
 export function useGlobalState<T>(stateName: string): [T, InternalState<T>["set"]] {
     const context = React.useContext(StoreContext);
@@ -21,22 +22,16 @@ export function useGlobalState<T>(stateName: string): [T, InternalState<T>["set"
     }, []);
 
     React.useEffect(() => {
-        setProp(state.name, "subs", [...state.subs, onUpdate]);
+        setProp(state.name, "subs", (a) => {
+            return [...a.subs, onUpdate];
+        });
 
         return () => {
-            console.log(state.subs);
-            setProp(
-                state.name,
-                "subs",
-                state.subs.filter((v) => v !== onUpdate)
-            );
+            setProp(state.name, "subs", (state) => {
+                return state.subs.filter((v) => v !== onUpdate);
+            });
         };
     }, []);
 
     return [state2, setter];
 }
-
-const isFunction = (value: any): value is Function => {
-    if (typeof value === "function") return true;
-    return false;
-};

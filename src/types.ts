@@ -2,7 +2,7 @@ import type React from "react";
 
 export type Setter<T> = (value: SetterArg<T>) => void;
 
-export type SetterArg<T> = ((value: T) => T) | T;
+export type SetterArg<Type, Para = Type> = ((value: Para) => Type) | Type;
 
 export type SubsFunction<T> = (state: InternalState<T>) => void;
 

@@ -1,6 +1,7 @@
 import React from "react";
 import StoreContext from "./StoreContext";
-import type { InternalState, InternalStateCollection, StateCollection } from "./types";
+import type { InternalState, InternalStateCollection, SetterArg, StateCollection } from "./types";
+import { isFunction } from "./utils";
 
 export interface StoreProviderProps {
     children: any;
@@ -8,8 +9,11 @@ export interface StoreProviderProps {
 }
 
 export let setValue = <T,>(state: string, value: T) => {};
-export let setProp = <T,>(state: string, prop: keyof InternalState<T>, value: T) => {};
-export let push = <T,>(state: string, prop: keyof InternalState<T>, value: T) => {};
+export let setProp = <Type, ReturnType>(
+    state: string,
+    prop: keyof InternalState<Type>,
+    value: SetterArg<ReturnType, InternalState<Type>>
+) => {};
 
 export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
     const parentContext = React.useContext(StoreContext);
@@ -20,6 +24,7 @@ export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
         // push  =  ()->{}
         setProp = (state, prop, value) => {
             setStates((originalState) => {
+                if (isFunction(value)) value = value(originalState[state]);
                 return Object.assign(originalState, {
                     [state]: {
                         ...originalState[state],
