@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { useGlobalState } from "restatoes";
 
 const Reseter: React.FC = () => {

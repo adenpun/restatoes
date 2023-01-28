@@ -1,42 +1,70 @@
-import React from "react";
+import * as React from "react";
 import StoreContext from "./StoreContext";
-import type { StateCollection, InternalStateCollection, SetterArg } from "./types";
+import type { InternalState, InternalStateCollection, SetterArg, StateCollection } from "./types";
+import { isFunction } from "./utils";
 
 export interface StoreProviderProps {
     children: any;
     states: StateCollection;
 }
 
-export let setValue = <T,>(states: string, value: T) => {};
+export let setValue = <Type,>(state: string, value: SetterArg<Type, Type>) => {};
+export let setProp = <Type, ReturnType>(
+    state: string,
+    prop: keyof InternalState<Type>,
+    value: SetterArg<ReturnType, InternalState<Type>>
+) => {};
+export let getValue = <Type,>(state: string): Promise<Type> => {
+    return new Promise<Type>((resolve, reject) => {
+        reject("ERROR");
+    });
+};
 
 export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
-    const parentContext = React.useContext(StoreContext);
+    // const parentContext = React.useContext(StoreContext);
 
-    const states: InternalStateCollection = { ...parentContext, ...props.states } as any;
+    const defaultStates: InternalStateCollection = props.states as any;
+
+    const [states, setStates] = React.useState(() => {
+        setProp = (state, prop, value) => {
+            setStates((originalState) => {
+                const passArg =
+                    prop === "value" ? originalState[state].value : originalState[state];
+                if (isFunction(value)) value = value(passArg);
+                return Object.assign(originalState, {
+                    [state]: {
+                        ...originalState[state],
+                        [prop]: value,
+                    },
+                });
+            });
+        };
+
+        setValue = (state, value) => {
+            setProp(state, "value", value as any);
+            setStates((states) => {
+                states[state].subs.forEach((sub) => sub(states[state]));
+                states[state].onChange?.(states[state].value);
+                return states;
+            });
+        };
+
+        getValue = (state) => {
+            return new Promise<any>((resolve) => {
+                setStates((states) => {
+                    resolve(states[state].value);
+                    return states;
+                });
+            });
+        };
+
+        return defaultStates;
+    });
 
     React.useMemo(() => {
-        setValue = (state, value) => {
-            if (!states[state].set) {
-                states[state].set = (value: SetterArg<any>) => {
-                    const isFunction = (v: any): v is Function => {
-                        if (typeof v === "function") return true;
-                        return false;
-                    };
-                    if (isFunction(value)) value = value(states[state].value);
-                    states[state].value = value;
-                    console.log(states[state].value);
-                    states[state].onChange?.(value);
-                    states[state].subs.forEach((sub) => {
-                        sub(states[state]);
-                    });
-                    return;
-                };
-            }
-            states[state].set(value);
-        };
         Object.keys(states).forEach((state) => {
-            console.log(Object.keys(states));
-            states[state].subs = [];
+            setProp(state, "name", state);
+            setProp(state, "subs", []);
             setValue(state, states[state].initialValue);
         });
     }, []);
