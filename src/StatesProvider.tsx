@@ -14,16 +14,16 @@ export let setProp = <Type, ReturnType>(
     prop: keyof InternalState<Type>,
     value: SetterArg<ReturnType, InternalState<Type>>
 ) => {};
-export let getValue = <Type,>(state: string): Promise<Type> => {
-    return new Promise<Type>((resolve, reject) => {
-        reject("ERROR");
-    });
+export let getValue = <Type,>(state: string): Type => {
+    return values[state];
 };
 
-export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
-    // const parentContext = React.useContext(StoreContext);
+let values: Record<string, any> = {};
 
-    const defaultStates: InternalStateCollection = props.states as any;
+export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
+    const parentContext = React.useContext(StoreContext);
+
+    const defaultStates: InternalStateCollection = { ...parentContext, ...props.states } as any;
 
     const [states, setStates] = React.useState(() => {
         setProp = (state, prop, value) => {
@@ -43,20 +43,21 @@ export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
         setValue = (state, value) => {
             setProp(state, "value", value as any);
             setStates((states) => {
+                values[state] = states[state].value;
                 states[state].subs.forEach((sub) => sub(states[state]));
                 states[state].onChange?.(states[state].value);
                 return states;
             });
         };
 
-        getValue = (state) => {
-            return new Promise<any>((resolve) => {
-                setStates((states) => {
-                    resolve(states[state].value);
-                    return states;
-                });
-            });
-        };
+        // getValue = (state) => {
+        //     return new Promise<any>((resolve) => {
+        //         setStates((states) => {
+        //             resolve(states[state].value);
+        //             return states;
+        //         });
+        //     });
+        // };
 
         return defaultStates;
     });
