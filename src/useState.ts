@@ -1,37 +1,41 @@
-import React from "react";
+import * as React from "react";
+import { getValue, setProp, setValue } from "./StatesProvider";
 import StoreContext from "./StoreContext";
-import type { InternalState, SetterArg, SubsFunction } from "./types";
+import type { InternalState, SubsFunction } from "./types";
+import { isFunction } from "./utils";
 
-export function useGlobalState<T>(state: string) {
+export function useGlobalState<T>(stateName: string): [T, InternalState<T>["set"]] {
     const context = React.useContext(StoreContext);
-    return useGlobalState2<T>(context[state]);
-}
+    const state: InternalState<T> = context[stateName];
 
-function useGlobalState2<T>(state: InternalState<T>): [T, InternalState<T>["set"]] {
-    const [state2, setState2] = React.useState<T>(state.value);
+    const [stateValue, setStateValue] = React.useState<T>(state.value);
 
-    const setter = React.useCallback(
-        (value: SetterArg<T>) => {
-            const isFunction = (v: any): v is Function => {
-                if (typeof v === "function") return true;
-                return false;
-            };
-            if (isFunction(value)) value = value(state.value);
-            state.set?.(value);
+    const setter = React.useCallback<InternalState<T>["set"]>(
+        (value) => {
+            setValue<T>(state.name, (originalValue) => {
+                if (isFunction(value)) value = value(originalValue);
+                return value;
+            });
+            return;
         },
-        [state.set]
+        [stateValue]
     );
 
-    const onUpdate: SubsFunction<T> = React.useCallback((state: InternalState<T>) => {
-        setState2(state.value!);
+    const onUpdate = React.useCallback<SubsFunction<T>>((state) => {
+        setStateValue(state.value);
     }, []);
 
     React.useEffect(() => {
-        state.subs.push(onUpdate);
+        setProp(state.name, "subs", (a) => {
+            return [...a.subs, onUpdate];
+        });
+
         return () => {
-            state.subs = state.subs.filter((v) => v !== onUpdate);
+            setProp(state.name, "subs", (state) => {
+                return state.subs.filter((v) => v !== onUpdate);
+            });
         };
     }, []);
 
-    return [state2, setter];
+    return [stateValue, setter];
 }
