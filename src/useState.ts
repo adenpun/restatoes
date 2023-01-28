@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { getValue, setProp, setValue } from "./StatesProvider";
 import StoreContext from "./StoreContext";
 import type { InternalState, SubsFunction } from "./types";
@@ -11,10 +11,11 @@ export function useGlobalState<T>(stateName: string): [T, InternalState<T>["set"
     const [stateValue, setStateValue] = React.useState<T>(state.value);
 
     const setter = React.useCallback<InternalState<T>["set"]>(
-        async (value) => {
-            const stateValue = await getValue<T>(state.name);
-            if (isFunction(value)) value = value(stateValue);
-            setValue(state.name, value);
+        (value) => {
+            setValue<T>(state.name, (originalValue) => {
+                if (isFunction(value)) value = value(originalValue);
+                return value;
+            });
             return;
         },
         [stateValue]

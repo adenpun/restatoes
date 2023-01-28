@@ -20,6 +20,6 @@ export type InternalState<T> = State<T> & {
     subs: SubsFunction<T>[];
 };
 
-export type InternalStateCollection = { [key: string]: InternalState<any> };
+export type InternalStateCollection = Record<string, InternalState<any>>;
 
 export type KeyOfInternalStateCollection = keyof React.Context<InternalStateCollection>;

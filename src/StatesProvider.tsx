@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import StoreContext from "./StoreContext";
 import type { InternalState, InternalStateCollection, SetterArg, StateCollection } from "./types";
 import { isFunction } from "./utils";
@@ -8,7 +8,7 @@ export interface StoreProviderProps {
     states: StateCollection;
 }
 
-export let setValue = <Type,>(state: string, value: Type) => {};
+export let setValue = <Type,>(state: string, value: SetterArg<Type, Type>) => {};
 export let setProp = <Type, ReturnType>(
     state: string,
     prop: keyof InternalState<Type>,
@@ -21,14 +21,16 @@ export let getValue = <Type,>(state: string): Promise<Type> => {
 };
 
 export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
-    const parentContext = React.useContext(StoreContext);
+    // const parentContext = React.useContext(StoreContext);
 
-    const defaultStates: InternalStateCollection = { ...parentContext, ...props.states } as any;
+    const defaultStates: InternalStateCollection = props.states as any;
 
     const [states, setStates] = React.useState(() => {
         setProp = (state, prop, value) => {
             setStates((originalState) => {
-                if (isFunction(value)) value = value(originalState[state]);
+                const passArg =
+                    prop === "value" ? originalState[state].value : originalState[state];
+                if (isFunction(value)) value = value(passArg);
                 return Object.assign(originalState, {
                     [state]: {
                         ...originalState[state],
@@ -39,9 +41,10 @@ export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
         };
 
         setValue = (state, value) => {
-            setProp(state, "value", value);
+            setProp(state, "value", value as any);
             setStates((states) => {
                 states[state].subs.forEach((sub) => sub(states[state]));
+                states[state].onChange?.(states[state].value);
                 return states;
             });
         };

@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { useGlobalState } from "restatoes";
 
 import Decreaser from "./components/Decreaser";
@@ -7,15 +7,18 @@ import Increaser from "./components/Increaser";
 import Reseter from "./components/Reseter";
 
 function App() {
-    const [changed] = useGlobalState<boolean>("showTip");
+    const [numberOfChange] = useGlobalState<number>("numberOfChange");
 
-    React.useEffect(() => {
-        console.log(changed);
-    });
     return (
         <>
             <h1>ReStatoes Demo</h1>
-            {changed ? <h6>The document title is changing too!</h6> : <></>}
+            {numberOfChange > 1 && numberOfChange < 11 ? (
+                <h3 style={{ position: "absolute", left: "0", top: "0" }}>
+                    The document title is changing too!
+                </h3>
+            ) : (
+                <></>
+            )}
             <Displayer />
             <Decreaser />
             <Reseter />
