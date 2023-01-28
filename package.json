@@ -1,6 +1,6 @@
 {
     "name": "restatoes",
-    "version": "0.0.1-beta.0",
+    "version": "0.0.1-beta.1",
     "type": "module",
     "license": "MIT",
     "files": [
@@ -23,5 +23,12 @@
     },
     "peerDependencies": {
         "react": "^18.2.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/adenpun/restatoes.git"
+    },
+    "bugs": {
+        "url": "https://github.com/adenpun/restatoes/issues"
     }
 }

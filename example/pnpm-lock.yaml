@@ -6,14 +6,14 @@ specifiers:
   '@vitejs/plugin-react-swc': ^3.0.0
   react: ^18.2.0
   react-dom: ^18.2.0
-  restatoes: link:..
+  restatoes: 0.0.1-beta.0
   typescript: ^4.9.3
   vite: ^4.0.0
 
 dependencies:
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
-  restatoes: link:..
+  restatoes: 0.0.1-beta.0_react@18.2.0
 
 devDependencies:
   '@types/react': 18.0.27
@@ -478,6 +478,14 @@ packages:
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
+
+  /restatoes/0.0.1-beta.0_react@18.2.0:
+    resolution: {integrity: sha512-qIlYwn8EU5rgDH/iVyUZMru/O7C2HZ6ui9uDM/inwJukS6QKiqQlAWKG/bCfqxoWTk7ZzvMy672UmiKGfyVEoA==}
+    peerDependencies:
+      react: ^18.2.0
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /rollup/3.11.0:
     resolution: {integrity: sha512-+uWPPkpWQ2H3Qi7sNBcRfhhHJyUNgBYhG4wKe5wuGRj2m55kpo+0p5jubKNBjQODyPe6tSBE3tNpdDwEisQvAQ==}
