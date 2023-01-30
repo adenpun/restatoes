@@ -26,30 +26,6 @@ export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
     const defaultStates: InternalStateCollection = { ...parentContext, ...props.states } as any;
 
     const [states, setStates] = React.useState(() => {
-        setProp = (state, prop, value) => {
-            setStates((originalState) => {
-                const passArg =
-                    prop === "value" ? originalState[state].value : originalState[state];
-                if (isFunction(value)) value = value(passArg);
-                return Object.assign(originalState, {
-                    [state]: {
-                        ...originalState[state],
-                        [prop]: value,
-                    },
-                });
-            });
-        };
-
-        setValue = (state, value) => {
-            setProp(state, "value", value as any);
-            setStates((states) => {
-                values[state] = states[state].value;
-                states[state].subs.forEach((sub) => sub(states[state]));
-                states[state].onChange?.(states[state].value);
-                return states;
-            });
-        };
-
         // getValue = (state) => {
         //     return new Promise<any>((resolve) => {
         //         setStates((states) => {
@@ -61,6 +37,36 @@ export const StatesProvider: React.FC<StoreProviderProps> = (props) => {
 
         return defaultStates;
     });
+
+    setProp = React.useCallback(
+        (state, prop, value) => {
+            setStates((originalState) => {
+                const passArg =
+                    prop === "value" ? originalState[state].value : originalState[state];
+                if (isFunction(value)) value = value(passArg);
+                return Object.assign(originalState, {
+                    [state]: {
+                        ...originalState[state],
+                        [prop]: value,
+                    },
+                });
+            });
+        },
+        [setStates]
+    );
+
+    setValue = React.useCallback(
+        (state, value) => {
+            setProp(state, "value", value as any);
+            setStates((states) => {
+                values[state] = states[state].value;
+                states[state].subs.forEach((sub) => sub(states[state]));
+                states[state].onChange?.(states[state].value);
+                return states;
+            });
+        },
+        [setProp]
+    );
 
     React.useMemo(() => {
         Object.keys(states).forEach((state) => {
