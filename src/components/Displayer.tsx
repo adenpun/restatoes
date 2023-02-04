@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useGlobalState } from "restatoes";
+import { useGlobalState } from "../../lib";
 
 const Displayer: React.FC = () => {
     const [count] = useGlobalState<number>("counter");

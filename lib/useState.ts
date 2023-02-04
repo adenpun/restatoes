@@ -1,5 +1,5 @@
 import * as React from "react";
-import { getValue, setProp, setValue } from "./StatesProvider";
+import { setProp, setValue } from "./StatesProvider";
 import StoreContext from "./StoreContext";
 import type { InternalState, SubsFunction } from "./types";
 import { isFunction } from "./utils";

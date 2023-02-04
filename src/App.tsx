@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useGlobalState } from "restatoes";
+import { useGlobalState } from "../lib";
 
 import Decreaser from "./components/Decreaser";
 import Displayer from "./components/Displayer";

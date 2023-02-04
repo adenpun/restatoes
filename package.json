@@ -1,34 +1,35 @@
 {
     "name": "restatoes",
-    "version": "0.0.1-beta.4",
+    "version": "0.0.0",
     "type": "module",
-    "license": "MIT",
     "files": [
         "dist"
     ],
-    "module": "./dist/index.jsx",
-    "types": "./dist/index.d.ts",
+    "main": "./dist/restatoes.umd.cjs",
+    "module": "./dist/restatoes.js",
+    "types": "./index.d.ts",
     "exports": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.jsx"
+        "import": "./dist/restatoes.js",
+        "require": "./dist/restatoes.umd.cjs"
     },
     "scripts": {
-        "dev": "tsc --watch",
-        "build": "tsc --build"
+        "dev": "vite",
+        "build": "tsc && vite build"
     },
     "devDependencies": {
+        "@rollup/plugin-typescript": "^11.0.0",
+        "@types/node": "^18.11.18",
         "@types/react": "^18.0.27",
+        "@types/react-dom": "^18.0.10",
+        "@vitejs/plugin-react": "^3.0.1",
         "react": "^18.2.0",
-        "typescript": "^4.9.4"
+        "react-dom": "^18.2.0",
+        "tslib": "^2.5.0",
+        "typescript": "^4.9.4",
+        "vite": "^4.0.0"
     },
     "peerDependencies": {
         "react": "^18.2.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/adenpun/restatoes.git"
-    },
-    "bugs": {
-        "url": "https://github.com/adenpun/restatoes/issues"
     }
 }
